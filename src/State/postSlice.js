@@ -1,13 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (_, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await fetch("https://react-crud-app-server.vercel.app/posts");
-      const data = await response.json();
-      return data;
+      const res = await axios.get(
+        "https://react-crud-app-server.vercel.app/posts"
+      );
+      return [...res.data];
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -18,9 +20,10 @@ export const fetchPost = createAsyncThunk(
   async (id, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await fetch(`https://react-crud-app-server.vercel.app/posts/${id}`);
-      const data = await response.json();
-      return data;
+      const res = await axios.get(
+        `https://react-crud-app-server.vercel.app/posts/${id}`
+      );
+      return res.data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -32,9 +35,9 @@ export const deletePost = createAsyncThunk(
   async (id, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      await fetch(`https://react-crud-app-server.vercel.app/posts/${id}`, {
-        method: "DELETE",
-      });
+      await axios.delete(
+        `https://react-crud-app-server.vercel.app/posts/${id}`
+      );
       return id;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -47,16 +50,18 @@ export const insertPost = createAsyncThunk(
     const { rejectWithValue, getState } = thunkAPI;
     const { authSlice } = getState();
     item.userId = authSlice.id;
+
     try {
-      const res = await fetch("https://react-crud-app-server.vercel.app/posts", {
-        method: "POST",
-        body: JSON.stringify(item),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      return data;
+      const res = await axios.post(
+        "https://react-crud-app-server.vercel.app/posts",
+        JSON.stringify(item),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -68,15 +73,16 @@ export const editPost = createAsyncThunk(
   async (item, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const res = await fetch(`https://react-crud-app-server.vercel.app/posts/${item.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(item),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      return data;
+      const res = await axios.patch(
+        `https://react-crud-app-server.vercel.app/posts/${item.id}`,
+        JSON.stringify(item),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
